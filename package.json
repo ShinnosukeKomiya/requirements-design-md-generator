@@ -1,6 +1,6 @@
 {
   "name": "requirements-md-generator",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Requirements document generator from YAML to Markdown",
   "type": "module",
   "bin": {
