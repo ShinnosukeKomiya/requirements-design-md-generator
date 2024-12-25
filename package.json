@@ -1,0 +1,24 @@
+{
+  "name": "requirements-md-generator",
+  "version": "1.0.0",
+  "description": "Requirements document generator from YAML to Markdown",
+  "type": "module",
+  "bin": {
+    "requirements-md-generator": "./bin/cli.js"
+  },
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "keywords": [
+    "requirements",
+    "md",
+    "markdown",
+    "yaml",
+    "generator"
+  ],
+  "license": "ISC",
+  "dependencies": {
+    "js-yaml": "^4.1.0"
+  }
+}
