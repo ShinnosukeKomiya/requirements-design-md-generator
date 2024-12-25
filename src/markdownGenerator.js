@@ -1,4 +1,5 @@
 import yaml from 'js-yaml';
+import fs from 'fs/promises';
 
 export class MarkdownGenerator {
   constructor(yamlContents) {
@@ -75,5 +76,83 @@ ${functionRows}`;
       this.generateToBeSection(),
       this.generateFunctionList()
     ].join('\n');
+  }
+
+  async generateFunctionRequirements(functionInfo) {
+    // 入力項目のテーブル行を生成
+    const inputRows = functionInfo.inputs
+      ? functionInfo.inputs.map(input =>
+          `| ${input.name} | ${input.required ? '必須' : '任意'} | ${input.format} | ${input.note} |`
+        ).join('\n')
+      : '| TODO | TODO: 後工程で記載 | TODO: 後工程で記載 | TODO: 後工程で記載 |';
+
+    // 出力項目のテーブル行を生成
+    const outputRows = functionInfo.outputs
+      ? functionInfo.outputs.map(output =>
+          `| ${output.name} | ${output.note} |`
+        ).join('\n')
+      : '| TODO | TODO: 後工程で記載 |';
+
+    return `# 機能要件定義書：${functionInfo.function_name}
+
+0. ステータス
+実装状況：未着手
+
+1. 機能概要
+1.1 機能ID
+FUN-${functionInfo.id}
+
+1.2 機能名
+${functionInfo.function_name}
+
+1.3 概要説明
+${functionInfo.description}
+
+1.4 機能の目的
+TODO: 後工程で記載
+
+2. 画面要件
+2.1 入力項目
+| 項目名 | 必須 | 形式制限 | 備考 |
+|--------|------|----------|------|
+${inputRows}
+
+2.2 出力項目
+| 項目名 | 備考 |
+|--------|------|
+${outputRows}
+
+2.3 対象ユーザー
+${functionInfo.targetUser || 'TODO: 後工程で記載'}
+
+3. 処理仕様
+3.1 業務フロー
+\`\`\`mermaid
+TODO: 後工程でsequenceDiagramを記載
+\`\`\`
+
+3.2 処理詳細
+TODO: 後工程で記載
+
+3.3 エラー処理
+TODO: 後工程で記載
+
+4. 非機能要件
+4.1 性能要件
+TODO: 後工程で記載
+
+4.2 セキュリティ要件
+TODO: 後工程で記載
+`;
+  }
+
+  async generateMarkdown(basicInfos, functionsList) {
+    // 既存の全体要件定義書の生成処理...
+
+    // 各機能の要件定義書を生成
+    for (const func of functionsList) {
+      const functionDoc = await this.generateFunctionRequirements(func);
+      await fs.writeFile(`output/functions/FUN-${func.id}.md`, functionDoc);
+    }
   }
 }
