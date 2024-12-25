@@ -80,16 +80,16 @@ ${functionRows}`;
 
   async generateFunctionRequirements(functionInfo) {
     // 入力項目のテーブル行を生成
-    const inputRows = functionInfo.inputs
-      ? functionInfo.inputs.map(input =>
-          `| ${input.name} | ${input.required ? '必須' : '任意'} | ${input.format} | ${input.note} |`
+    const inputRows = functionInfo.input
+      ? functionInfo.input.split('、').map(input =>
+          `| ${input.trim()} | TODO: 後工程で記載 | TODO: 後工程で記載 | TODO: 後工程で記載 |`
         ).join('\n')
       : '| TODO | TODO: 後工程で記載 | TODO: 後工程で記載 | TODO: 後工程で記載 |';
 
     // 出力項目のテーブル行を生成
-    const outputRows = functionInfo.outputs
-      ? functionInfo.outputs.map(output =>
-          `| ${output.name} | ${output.note} |`
+    const outputRows = functionInfo.output
+      ? functionInfo.output.split('、').map(output =>
+          `| ${output.trim()} | TODO: 後工程で記載 |`
         ).join('\n')
       : '| TODO | TODO: 後工程で記載 |';
 
@@ -123,7 +123,7 @@ ${inputRows}
 ${outputRows}
 
 2.3 対象ユーザー
-${functionInfo.targetUser || 'TODO: 後工程で記載'}
+${functionInfo.user || 'TODO: 後工程で記載'}
 
 3. 処理仕様
 3.1 業務フロー
