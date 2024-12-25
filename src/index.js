@@ -31,7 +31,7 @@ export async function main() {
     // 個別の機能要件定義書を生成
     for (const func of generator.functions) {
       const functionDoc = await generator.generateFunctionRequirements(func);
-      await fs.writeFile(`output/functions/FUN-${func.id}.md`, functionDoc);
+      await fs.writeFile(`output/functions/${func.id}.md`, functionDoc);
     }
 
     console.log('Markdown files have been generated successfully!');
