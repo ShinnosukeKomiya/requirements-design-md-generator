@@ -100,7 +100,7 @@ ${functionRows}`;
 
 1. 機能概要
 1.1 機能ID
-FUN-${functionInfo.id}
+${functionInfo.id}
 
 1.2 機能名
 ${functionInfo.function_name}
@@ -152,7 +152,7 @@ TODO: 後工程で記載
     // 各機能の要件定義書を生成
     for (const func of functionsList) {
       const functionDoc = await this.generateFunctionRequirements(func);
-      await fs.writeFile(`output/functions/FUN-${func.id}.md`, functionDoc);
+      await fs.writeFile(`output/functions/${func.id}.md`, functionDoc);
     }
   }
 }
