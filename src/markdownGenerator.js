@@ -87,7 +87,7 @@ ${screenRows}`;
             `| ${data.table}.${item} | TODO: 後工程で記載 | TODO: 後工程で記載 | TODO: 後工程で記載 |`
           ).join('\n')
         ).join('\n')
-      : '| TODO | TODO: 後工程で記載 | TODO: 後工程で記載 | TODO: 後工程で記載 |';
+      : '';
 
     // 出力項目のテーブル行を生成（postData配列から）
     const postDataRows = screenInfo.postData
@@ -96,7 +96,7 @@ ${screenRows}`;
             `| ${data.table}.${item} | TODO: 後工程で記載 |`
           ).join('\n')
         ).join('\n')
-      : '| TODO | TODO: 後工程で記載 |';
+      : '';
 
     return `# 画面要件定義書：${screenInfo.screenName}
 
@@ -118,7 +118,7 @@ TODO: 後工程で記載
 
 ## 2. 画面要件
 ### 2.1 画面項目
-| 項目名 | 必須 | 形���制限 | 備考 |
+| 項目名 | 必須 | 形式制限 | 備考 |
 |--------|------|----------|------|
 ${getDataRows}
 
