@@ -8,6 +8,7 @@ export class MarkdownGenerator {
     this.nonFunctions = yaml.load(yamlContents.nonFunctionsList);
     this.functions = yaml.load(yamlContents.functionsList);
     this.operations = yaml.load(yamlContents.tobeOperationFlow);
+    this.screens = yaml.load(yamlContents.screensList);
   }
 
   generateBasicSection() {
@@ -55,95 +56,27 @@ ${this.requirements.map(req => `- ${req.requirement_name}：${req.description}`)
 ${this.nonFunctions.map(nf => `- ${nf.non_function_name}：${nf.description}`).join('\n')}`;
   }
 
-  generateFunctionList() {
-    const functionRows = this.functions
+  generateScreenList() {
+    const screenRows = this.screens
       .sort((a, b) => a.id.localeCompare(b.id))
-      .map(func => {
-        return `| ${func.id} | ${func.function_name} | ${func.description} | [詳細](./functions/${func.id}.md) |`;
+      .map(screen => {
+        return `| ${screen.id} | ${screen.screenName} | ${screen.description} | [詳細](./screens/${screen.id}.md) |`;
       })
       .join('\n');
 
     return `
-## 3. 機能要件一覧
-| 機能ID | 機能名 | 要約 | 詳細定義書リンク |
+## 3. 画面要件一覧
+| 画面ID | 画面名 | 要約 | 詳細定義書リンク |
 |--------|--------|------|------------------|
-${functionRows}`;
+${screenRows}`;
   }
 
   generateFullMarkdown() {
     return [
       this.generateBasicSection(),
       this.generateToBeSection(),
-      this.generateFunctionList()
+      this.generateScreenList()
     ].join('\n');
-  }
-
-  async generateFunctionRequirements(functionInfo) {
-    // 入力項目のテーブル行を生成
-    const inputRows = functionInfo.input
-      ? functionInfo.input.split('、').map(input =>
-          `| ${input.trim()} | TODO: 後工程で記載 | TODO: 後工程で記載 | TODO: 後工程で記載 |`
-        ).join('\n')
-      : '| TODO | TODO: 後工程で記載 | TODO: 後工程で記載 | TODO: 後工程で記載 |';
-
-    // 出力項目のテーブル行を生成
-    const outputRows = functionInfo.output
-      ? functionInfo.output.split('、').map(output =>
-          `| ${output.trim()} | TODO: 後工程で記載 |`
-        ).join('\n')
-      : '| TODO | TODO: 後工程で記載 |';
-
-    return `# 機能要件定義書：${functionInfo.function_name}
-
-## 0. ステータス
-実装状況：未着手
-
-## 1. 機能概要
-### 1.1 機能ID
-${functionInfo.id}
-
-### 1.2 機能名
-${functionInfo.function_name}
-
-### 1.3 概要説明
-${functionInfo.description}
-
-### 1.4 機能の目的
-TODO: 後工程で記載
-
-## 2. 画面要件
-### 2.1 入力項目
-| 項目名 | 必須 | 形式制限 | 備考 |
-|--------|------|----------|------|
-${inputRows}
-
-### 2.2 出力項目
-| 項目名 | 備考 |
-|--------|------|
-${outputRows}
-
-### 2.3 対象ユーザー
-${functionInfo.user || 'TODO: 後工程で記載'}
-
-## 3. 処理仕様
-### 3.1 業務フロー
-\`\`\`mermaid
-TODO: 後工程でsequenceDiagramを記載
-\`\`\`
-
-### 3.2 処理詳細
-TODO: 後工程で記載
-
-### 3.3 エラー処理
-TODO: 後工程で記載
-
-## 4. 非機能要件
-### 4.1 性能要件
-TODO: 後工程で記載
-
-### 4.2 セキュリティ要件
-TODO: 後工程で記載
-`;
   }
 
   async generateScreenRequirements(screenInfo) {
@@ -210,27 +143,16 @@ ${screenInfo.operatingProcedure}
 ### 3.3 共通コンポーネント
 ${screenInfo.commonComponent ? screenInfo.commonComponent.join(', ') : 'なし'}
 
-## 4. データ要件
-### 4.1 取得データ
-${screenInfo.getData ? screenInfo.getData.map(data =>
-  `- ${data.table}テーブル\n  - ${data.items.join('\n  - ')}`
-).join('\n') : 'なし'}
-
-### 4.2 更新データ
-${screenInfo.postData ? screenInfo.postData.map(data =>
-  `- ${data.table}テーブル\n  - ${data.items.join('\n  - ')}`
-).join('\n') : 'なし'}
-
-## 5. 非機能要件
-### 5.1 性能要件
+## 4. 非機能要件
+### 4.1 性能要件
 TODO: 後工程で記載
 
-### 5.2 セキュリティ要件
+### 4.2 セキュリティ要件
 TODO: 後工程で記載
 `;
   }
 
-  async generateMarkdown(basicInfos, screensList) {
+  async generateMarkdown() {
     // 全体要件定義書の生成
     const fullDoc = this.generateFullMarkdown();
 
@@ -247,7 +169,7 @@ TODO: 後工程で記載
     await fs.writeFile('output/requirements.md', fullDoc);
 
     // 各画面の要件定義書を生成
-    for (const screen of screensList) {
+    for (const screen of this.screens) {
       const screenDoc = await this.generateScreenRequirements(screen);
       await fs.writeFile(`output/screens/${screen.id}.md`, screenDoc);
     }
