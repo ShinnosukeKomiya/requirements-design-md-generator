@@ -1,13 +1,11 @@
 import { MarkdownGenerator } from './markdownGenerator.js';
 import fs from 'fs/promises';
 import path from 'path';
+import yaml from 'js-yaml';
 
 export async function main() {
   try {
-    // output/functionsディレクトリを作成
-    await fs.mkdir('output/functions', { recursive: true });
-
-    // YAMLファイルの読み込み
+    // 必要なすべてのYAMLファイルを読み込む
     const yamlContents = {
       basicInfos: await fs.readFile(path.join(process.cwd(), 'docs/requirements', 'basicInfos.yml'), 'utf8'),
       requirementsList: await fs.readFile(path.join(process.cwd(), 'docs/requirements', 'requirementsList.yml'), 'utf8'),
@@ -16,23 +14,17 @@ export async function main() {
       tobeOperationFlow: await fs.readFile(path.join(process.cwd(), 'docs/requirements', 'tobeOperationFlow.yml'), 'utf8')
     };
 
-    // Markdownの生成
+    // screensList.ymlを別途読み込む
+    const screensList = await fs.readFile(path.join(process.cwd(), 'docs/requirements', 'screensList.yml'), 'utf8');
+
+    // MarkdownGeneratorのインスタンス化
     const generator = new MarkdownGenerator(yamlContents);
 
-    // 全体の要件定義書を生成
-    const markdown = generator.generateFullMarkdown();
+    // output/screensディレクトリを作成（存在しない場合）
+    await fs.mkdir('output/screens', { recursive: true });
 
-    // 出力ディレクトリの作成（存在しない場合）
-    await fs.mkdir('output', { recursive: true });
-
-    // 全体の要件定義書を出力
-    await fs.writeFile(path.join('output', 'requirements.md'), markdown);
-
-    // 個別の機能要件定義書を生成
-    for (const func of generator.functions) {
-      const functionDoc = await generator.generateFunctionRequirements(func);
-      await fs.writeFile(`output/functions/${func.id}.md`, functionDoc);
-    }
+    // Markdown生成
+    await generator.generateMarkdown(yamlContents.basicInfos, yaml.load(screensList));
 
     console.log('Markdown files have been generated successfully!');
   } catch (error) {
@@ -40,3 +32,5 @@ export async function main() {
     process.exit(1);
   }
 }
+
+main();

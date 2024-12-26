@@ -146,13 +146,110 @@ TODO: 後工程で記載
 `;
   }
 
-  async generateMarkdown(basicInfos, functionsList) {
-    // 既存の全体要件定義書の生成処理...
+  async generateScreenRequirements(screenInfo) {
+    // 入力項目のテーブル行を生成（getData配列から）
+    const getDataRows = screenInfo.getData
+      ? screenInfo.getData.map(data =>
+          data.items.map(item =>
+            `| ${data.table}.${item} | TODO: 後工程で記載 | TODO: 後工程で記載 | TODO: 後工程で記載 |`
+          ).join('\n')
+        ).join('\n')
+      : '| TODO | TODO: 後工程で記載 | TODO: 後工程で記載 | TODO: 後工程で記載 |';
 
-    // 各機能の要件定義書を生成
-    for (const func of functionsList) {
-      const functionDoc = await this.generateFunctionRequirements(func);
-      await fs.writeFile(`output/functions/${func.id}.md`, functionDoc);
+    // 出力項目のテーブル行を生成（postData配列から）
+    const postDataRows = screenInfo.postData
+      ? screenInfo.postData.map(data =>
+          data.items.map(item =>
+            `| ${data.table}.${item} | TODO: 後工程で記載 |`
+          ).join('\n')
+        ).join('\n')
+      : '| TODO | TODO: 後工程で記載 |';
+
+    return `# 画面要件定義書：${screenInfo.screenName}
+
+## 0. ステータス
+実装状況：未着手
+
+## 1. 画面概要
+### 1.1 画面ID
+${screenInfo.id}
+
+### 1.2 画面名
+${screenInfo.screenName}
+
+### 1.3 概要説明
+${screenInfo.description}
+
+### 1.4 画面の目的
+TODO: 後工程で記載
+
+## 2. 画面要件
+### 2.1 画面項目
+| 項目名 | 必須 | 形���制限 | 備考 |
+|--------|------|----------|------|
+${getDataRows}
+
+### 2.2 画面アクション
+| アクション | 備考 |
+|------------|------|
+${postDataRows}
+
+### 2.3 対象ユーザー
+${screenInfo.user}
+
+### 2.4 アクセス権限
+${screenInfo.accessRight}
+
+## 3. 画面仕様
+### 3.1 画面コンポーネント
+${screenInfo['Screen components']}
+
+### 3.2 操作手順
+${screenInfo.operatingProcedure}
+
+### 3.3 共通コンポーネント
+${screenInfo.commonComponent ? screenInfo.commonComponent.join(', ') : 'なし'}
+
+## 4. データ要件
+### 4.1 取得データ
+${screenInfo.getData ? screenInfo.getData.map(data =>
+  `- ${data.table}テーブル\n  - ${data.items.join('\n  - ')}`
+).join('\n') : 'なし'}
+
+### 4.2 更新データ
+${screenInfo.postData ? screenInfo.postData.map(data =>
+  `- ${data.table}テーブル\n  - ${data.items.join('\n  - ')}`
+).join('\n') : 'なし'}
+
+## 5. 非機能要件
+### 5.1 性能要件
+TODO: 後工程で記載
+
+### 5.2 セキュリティ要件
+TODO: 後工程で記載
+`;
+  }
+
+  async generateMarkdown(basicInfos, screensList) {
+    // 全体要件定義書の生成
+    const fullDoc = this.generateFullMarkdown();
+
+    // output/screensディレクトリを作成（存在しない場合）
+    try {
+      await fs.mkdir('output/screens', { recursive: true });
+    } catch (error) {
+      if (error.code !== 'EEXIST') {
+        throw error;
+      }
+    }
+
+    // 全体要件定義書を保存
+    await fs.writeFile('output/requirements.md', fullDoc);
+
+    // 各画面の要件定義書を生成
+    for (const screen of screensList) {
+      const screenDoc = await this.generateScreenRequirements(screen);
+      await fs.writeFile(`output/screens/${screen.id}.md`, screenDoc);
     }
   }
 }
