@@ -93,7 +93,7 @@ ${screenRows}`;
     const postDataRows = screenInfo.postData
       ? screenInfo.postData.map(data =>
           data.items.map(item =>
-            `| ${data.table}.${item} | TODO: 後工程で記載 |`
+            `| ${data.table}.${item} | TODO: 後工程で記載 | TODO: 後工程で記載 | TODO: 後工程で記載 |`
           ).join('\n')
         ).join('\n')
       : '';
@@ -117,14 +117,14 @@ ${screenInfo.description}
 TODO: 後工程で記載
 
 ## 2. 画面要件
-### 2.1 画面項目
+### 2.1 Get Data
 | 項目名 | 必須 | 形式制限 | 備考 |
 |--------|------|----------|------|
 ${getDataRows}
 
-### 2.2 画面アクション
-| アクション | 備考 |
-|------------|------|
+### 2.2 Post Data
+| 項目名 | 必須 | 形式制限 | 備考 |
+|--------|------|----------|------|
 ${postDataRows}
 
 ### 2.3 対象ユーザー
