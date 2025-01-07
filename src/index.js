@@ -4,17 +4,17 @@ import path from 'path';
 
 export async function main() {
   try {
-    // 必要なすべてのYAMLファイルを読み込む
-    const yamlContents = {
-      basicInfos: await fs.readFile(path.join(process.cwd(), 'docs', 'basicInfos.yml'), 'utf8'),
-      requirementsList: await fs.readFile(path.join(process.cwd(), 'docs', 'requirementsList.yml'), 'utf8'),
-      nonFunctionsList: await fs.readFile(path.join(process.cwd(), 'docs', 'nonFunctionsList.yml'), 'utf8'),
-      functionsList: await fs.readFile(path.join(process.cwd(), 'docs', 'functionsList.yml'), 'utf8'),
-      tobeOperationFlow: await fs.readFile(path.join(process.cwd(), 'docs', 'tobeOperationFlow.yml'), 'utf8'),
-      screensList: await fs.readFile(path.join(process.cwd(), 'docs', 'screensList.yml'), 'utf8')
+    // JSONファイルを読み込んでパースする
+    const jsonContents = {
+      basicInfos: JSON.parse(await fs.readFile(path.join(process.cwd(), 'docs', 'basicInfos.json'), 'utf8')),
+      requirementsList: JSON.parse(await fs.readFile(path.join(process.cwd(), 'docs', 'requirementsList.json'), 'utf8')),
+      nonFunctionsList: JSON.parse(await fs.readFile(path.join(process.cwd(), 'docs', 'nonFunctionsList.json'), 'utf8')),
+      functionsList: JSON.parse(await fs.readFile(path.join(process.cwd(), 'docs', 'functionsList.json'), 'utf8')),
+      tobeOperationFlow: JSON.parse(await fs.readFile(path.join(process.cwd(), 'docs', 'tobeOperationFlow.json'), 'utf8')),
+      screensList: JSON.parse(await fs.readFile(path.join(process.cwd(), 'docs', 'screensList.json'), 'utf8'))
     };
     // MarkdownGeneratorのインスタンス化
-    const generator = new MarkdownGenerator(yamlContents);
+    const generator = new MarkdownGenerator(jsonContents);
 
     // Markdown生成
     await generator.generateMarkdown();
