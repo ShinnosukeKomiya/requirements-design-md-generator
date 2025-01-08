@@ -1,13 +1,14 @@
+import yaml from 'js-yaml';
 import fs from 'fs/promises';
 
 export class MarkdownGenerator {
-  constructor(jsonContents) {
-    this.basicInfo = jsonContents.basicInfos;
-    this.requirements = jsonContents.requirementsList;
-    this.nonFunctions = jsonContents.nonFunctionsList;
-    this.functions = jsonContents.functionsList;
-    this.operations = jsonContents.tobeOperationFlow;
-    this.screens = jsonContents.screensList;
+  constructor(yamlContents) {
+    this.basicInfo = yaml.load(yamlContents.basicInfos);
+    this.requirements = yaml.load(yamlContents.requirementsList);
+    this.nonFunctions = yaml.load(yamlContents.nonFunctionsList);
+    this.functions = yaml.load(yamlContents.functionsList);
+    this.operations = yaml.load(yamlContents.tobeOperationFlow);
+    this.screens = yaml.load(yamlContents.screensList);
   }
 
   generateBasicSection() {
@@ -45,20 +46,7 @@ ${this.basicInfo.about_project}
 ## 2. To-Be要件
 
 ### 2.1 システム化の方針
-${this.operations.map(op => {
-  let mermaid;
-  if (typeof op.value === 'string') {
-    try {
-      const parsedValue = JSON.parse(op.value);
-      mermaid = parsedValue.mermaid;
-    } catch (e) {
-      mermaid = 'graph TD\nA[パース失敗]';
-    }
-  } else {
-    mermaid = op.value?.mermaid || op.mermaid || 'graph TD\nA[未定義]';
-  }
-  return `#### ${op.id}\n\`\`\`mermaid\n${mermaid}\n\`\`\``;
-}).join('\n\n')}
+${this.operations.map(op => `#### ${op.id}\n\`\`\`mermaid\n${op.value.mermaid}\n\`\`\``).join('\n\n')}
 
 ### 2.2 実現すべき要件
 #### 2.2.1 機能要件
@@ -92,24 +80,21 @@ ${screenRows}`;
   }
 
   async generateScreenRequirements(screenInfo) {
-    // getData と postData が配列でない場合のガード処理を追加
-    const getDataRows = screenInfo.getData && Array.isArray(screenInfo.getData)
+    // 入力項目のテーブル行を生成（getData配列から）
+    const getDataRows = screenInfo.getData
       ? screenInfo.getData.map(data =>
-          data.items && Array.isArray(data.items)
-            ? data.items.map(item =>
-                `| ${data.table}.${item} | TODO: 後工程で記載 | TODO: 後工程で記載 | TODO: 後工程で記載 |`
-              ).join('\n')
-            : ''
+          data.items.map(item =>
+            `| ${data.table}.${item} | TODO: 後工程で記載 | TODO: 後工程で記載 | TODO: 後工程で記載 |`
+          ).join('\n')
         ).join('\n')
       : '';
 
-    const postDataRows = screenInfo.postData && Array.isArray(screenInfo.postData)
+    // 出力項目のテーブル行を生成（postData配列から）
+    const postDataRows = screenInfo.postData
       ? screenInfo.postData.map(data =>
-          data.items && Array.isArray(data.items)
-            ? data.items.map(item =>
-                `| ${data.table}.${item} | TODO: 後工程で記載 | TODO: 後工程で記載 | TODO: 後工程で記載 |`
-              ).join('\n')
-            : ''
+          data.items.map(item =>
+            `| ${data.table}.${item} | TODO: 後工程で記載 | TODO: 後工程で記載 | TODO: 後工程で記載 |`
+          ).join('\n')
         ).join('\n')
       : '';
 
@@ -156,7 +141,7 @@ ${screenInfo['Screen components']}
 ${screenInfo.operatingProcedure}
 
 ### 3.3 共通コンポーネント
-${Array.isArray(screenInfo.commonComponent) ? screenInfo.commonComponent.join(', ') : 'なし'}
+${screenInfo.commonComponent ? screenInfo.commonComponent.join(', ') : 'なし'}
 
 ## 4. 非機能要件
 ### 4.1 性能要件
