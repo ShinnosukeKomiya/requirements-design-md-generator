@@ -188,9 +188,9 @@ TODO: 後工程で記載
     // 全体要件定義書の生成
     const fullDoc = this.generateFullMarkdown();
 
-    // output/screensディレクトリを作成（存在しない場合）
+    // docs/screensディレクトリを作成（存在しない場合）
     try {
-      await fs.mkdir('output/screens', { recursive: true });
+      await fs.mkdir('docs/screens', { recursive: true });
     } catch (error) {
       if (error.code !== 'EEXIST') {
         throw error;
@@ -198,12 +198,12 @@ TODO: 後工程で記載
     }
 
     // 全体要件定義書を保存
-    await fs.writeFile('output/requirements.md', fullDoc);
+    await fs.writeFile('docs/requirements.md', fullDoc);
 
     // 各画面の要件定義書を生成
     for (const screen of this.screens) {
       const screenDoc = await this.generateScreenRequirements(screen);
-      await fs.writeFile(`output/screens/${screen.id}.md`, screenDoc);
+      await fs.writeFile(`docs/screens/${screen.id}.md`, screenDoc);
     }
   }
 }
