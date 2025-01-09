@@ -2,13 +2,37 @@ import yaml from 'js-yaml';
 import fs from 'fs/promises';
 
 export class MarkdownGenerator {
+  // 再帰的にJSONパースを試みる関数を修正
+  parseNestedJson(value) {
+    if (typeof value === 'string') {
+      try {
+        const unescaped = value.replace(/\\"/g, '"');
+        return this.parseNestedJson(JSON.parse(unescaped));
+      } catch (e) {
+        return value;
+      }
+    } else if (Array.isArray(value)) {
+      return value.map(item => this.parseNestedJson(item));
+    } else if (value && typeof value === 'object') {
+      const result = {};
+      for (const [key, val] of Object.entries(value)) {
+        result[key] = this.parseNestedJson(val);
+      }
+      return result;
+    }
+    return value;
+  }
+
   constructor(yamlContents) {
     this.basicInfo = yaml.load(yamlContents.basicInfos);
     this.requirements = yaml.load(yamlContents.requirementsList);
     this.nonFunctions = yaml.load(yamlContents.nonFunctionsList);
     this.functions = yaml.load(yamlContents.functionsList);
     this.operations = yaml.load(yamlContents.tobeOperationFlow);
-    this.screens = yaml.load(yamlContents.screensList);
+
+    // screensListに対して再帰的なパースを適用
+    const rawScreens = yaml.load(yamlContents.screensList);
+    this.screens = this.parseNestedJson(rawScreens);
   }
 
   generateBasicSection() {
@@ -80,23 +104,31 @@ ${screenRows}`;
   }
 
   async generateScreenRequirements(screenInfo) {
-    // 入力項目のテーブル行を生成（getData配列から）
-    const getDataRows = screenInfo.getData
-      ? screenInfo.getData.map(data =>
+    // getDataの処理
+    let getDataRows = '';
+    if (screenInfo.getData) {
+      const getDataArray = this.parseNestedJson(screenInfo.getData);
+      if (Array.isArray(getDataArray)) {
+        getDataRows = getDataArray.map(data =>
           data.items.map(item =>
             `| ${data.table}.${item} | TODO: 後工程で記載 | TODO: 後工程で記載 | TODO: 後工程で記載 |`
           ).join('\n')
-        ).join('\n')
-      : '';
+        ).join('\n');
+      }
+    }
 
-    // 出力項目のテーブル行を生成（postData配列から）
-    const postDataRows = screenInfo.postData
-      ? screenInfo.postData.map(data =>
+    // postDataの処理
+    let postDataRows = '';
+    if (screenInfo.postData) {
+      const postDataArray = this.parseNestedJson(screenInfo.postData);
+      if (Array.isArray(postDataArray)) {
+        postDataRows = postDataArray.map(data =>
           data.items.map(item =>
             `| ${data.table}.${item} | TODO: 後工程で記載 | TODO: 後工程で記載 | TODO: 後工程で記載 |`
           ).join('\n')
-        ).join('\n')
-      : '';
+        ).join('\n');
+      }
+    }
 
     return `# 画面要件定義書：${screenInfo.screenName}
 
