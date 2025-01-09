@@ -130,22 +130,32 @@ ${screenRows}`;
       }
     }
 
+    // 画面コンポーネントと共通コンポーネントの箇条書き処理
+    const screenComponentsList = screenInfo['Screen components']
+      ? screenInfo['Screen components'].split(',').map(component => `- ${component.trim()}`).join('\n')
+      : null;
+
+    const commonComponentsList = screenInfo.commonComponent
+      ? screenInfo.commonComponent.map(component => `- ${component}`).join('\n')
+      : null;
+
     return `# 画面要件定義書：${screenInfo.screenName}
 
-## 0. ステータス
-実装状況：未着手
-
-## 1. 画面概要
+## 1. 画面要件
 ### 1.1 画面ID
 ${screenInfo.id}
 
 ### 1.2 画面名
 ${screenInfo.screenName}
 
-### 1.3 概要説明
-${screenInfo.description}
+### 1.3 対象ユーザー
+${screenInfo.user}
 
-### 1.4 画面の目的
+### 1.4 要件一覧（ユーザーストーリー）
+- ${screenInfo.operatingProcedure}
+- TODO: 追加があれば後工程で記載
+
+### 1.5 非機能要件
 TODO: 後工程で記載
 
 ## 2. 画面要件
@@ -159,29 +169,13 @@ ${getDataRows}
 |--------|------|----------|------|
 ${postDataRows}
 
-### 2.3 対象ユーザー
-${screenInfo.user}
-
-### 2.4 アクセス権限
+### 2.3 アクセス権限
 ${screenInfo.accessRight}
 
-## 3. 画面仕様
-### 3.1 画面コンポーネント
-${screenInfo['Screen components']}
-
-### 3.2 操作手順
-${screenInfo.operatingProcedure}
-
-### 3.3 共通コンポーネント
-${screenInfo.commonComponent ? screenInfo.commonComponent.join(', ') : 'なし'}
-
-## 4. 非機能要件
-### 4.1 性能要件
-TODO: 後工程で記載
-
-### 4.2 セキュリティ要件
-TODO: 後工程で記載
-`;
+### 2.4 画面コンポーネント
+${screenComponentsList || commonComponentsList
+  ? `${screenComponentsList || ''}${screenComponentsList && commonComponentsList ? '\n' : ''}${commonComponentsList || ''}`
+  : '- なし'}`;
   }
 
   async generateMarkdown() {
